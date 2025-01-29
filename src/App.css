@@ -1,0 +1,101 @@
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.centered-tabs {
+  display: flex;
+  justify-content: center;
+  margin: 30px 0;
+  position: relative;
+}
+
+.nav-tabs {
+  border-bottom: none;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-item {
+  margin: 0 15px;
+  position: relative;
+}
+
+.nav-link {
+  border: none !important;
+  background: transparent !important;
+  color: #6c757d !important;
+  font-size: 1.1rem;
+  padding: 2px 25px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.nav-link.active {
+  color: #dc3545 !important;
+  font-weight: 600;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 3px;
+  background: #dc3545;
+  border-radius: 2px;
+  animation: underline 0.3s ease;
+}
+
+.nav-link:hover:not(.active) {
+  color: #dc3545 !important;
+}
+
+.recipe-card {
+      padding: 0; /* Remove extra padding */
+      margin: 30px 40px;
+      border-radius: 15px; /* Rounded corners */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+      width: 100%; /* Ensures the card takes full width of the column */
+      max-width: 320px; /* Fixed width for cards */
+      height: 400px; /* Fixed height for all cards */
+      display: flex;
+      flex-direction: column; /* Align content vertically */
+      overflow: hidden; /* Hide any content that overflows */
+      }
+
+      .recipe-card img {
+      object-fit: cover; /* Ensure the image fits the card */
+      height: 200px; /* Fixed image height */
+      width: 100%; /* Ensure the image takes full width */
+      border-radius: 15px 15px 0 0; /* Rounded corners on top */
+      }
+
+      .card-body {
+      padding: 10px;
+      height: 100%; /* Fill the height of the card */
+      overflow: hidden; /* Prevent text from overflowing */
+      display: flex;
+      flex-direction: column; /* Ensure content stays inside the card */
+      }
+
+      .card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis; /* Adds ellipsis if the text is too long */
+      white-space: nowrap; /* Prevent text from wrapping */
+      }
+
+      .card-text {
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      overflow: hidden; /* Hide overflow content */
+      text-overflow: ellipsis; /* Add ellipsis if text overflows */
+      white-space: nowrap; /* Prevent text wrapping */
+      }
