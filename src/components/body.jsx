@@ -3,19 +3,20 @@
 // import Header from './header';
 // import '../App.css';
 // import { Nav, NavItem, NavLink, TabContent, TabPane, Row, Col, Card, CardImg, CardBody, CardTitle, CardText, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+// import { toast } from 'react-toastify';
 
 // const Body = () => {
 //     const [activeTab, setActiveTab] = useState('1');
 //     const [recipes, setRecipes] = useState([]);
 //     const [modalOpen, setModalOpen] = useState(false);
-//     const [selectedMeal, setSelectedMeal] = useState(null); // state to store selected meal
-//     const [selectedWeek, setSelectedWeek] = useState(null); // state to store selected week
+//     const [selectedMeal, setSelectedMeal] = useState(null);
+//     const [selectedWeek, setSelectedWeek] = useState(null);
 //     const [weekMeals, setWeekMeals] = useState({
-//         '2': [], // Week 1
-//         '3': [], // Week 2
-//         '4': [], // Week 3
-//         '5': [], // Week 4
-//     }); // state to store meals for each week
+//         '2': [],
+//         '3': [],
+//         '4': [],
+//         '5': [],
+//     });
 
 //     const getRecords = async () => {
 //         try {
@@ -37,27 +38,92 @@
 //     const toggleModal = () => setModalOpen(!modalOpen);
 
 //     const handleCardClick = (meal) => {
-//         setSelectedMeal(meal); // Set selected meal when a card is clicked
+//         setSelectedMeal(meal);
 //     };
-    
-
-//     console.log(selectedMeal, 'meal')
 
 //     const handleSaveMeal = () => {
 //         if (selectedMeal && selectedWeek) {
-//             setWeekMeals((prevMeals) => {
-//                 const updatedMeals = { ...prevMeals };
-//                 updatedMeals[selectedWeek].push(selectedMeal); // Add the selected meal to the selected week
-//                 return updatedMeals;
-//             });
-//             setModalOpen(false); // Close the modal after saving
+//             const alreadyAdded = weekMeals[selectedWeek].some(meal => meal.id === selectedMeal.id);
+    
+//             if (alreadyAdded) {
+//                 toast.error('This meal is already added to the selected week!');
+//                 return;
+//             }
+    
+//             setWeekMeals((prevMeals) => ({
+//                 ...prevMeals,
+//                 [selectedWeek]: [...prevMeals[selectedWeek], selectedMeal]
+//             }));
+//             setModalOpen(false);
+//             toast.success("Meal Added Successfully")
 //         } else {
 //             alert('Please select a meal and a week!');
 //         }
 //     };
 
 //     const handleWeekSelection = (week) => {
-//         setSelectedWeek(week); // Set selected week when a tab is clicked in the modal
+//         setSelectedWeek(week);
+//     };
+
+//     // Delete meal handler
+//     const handleDelete = (week, mealId) => {
+//         setWeekMeals(prev => ({
+//             ...prev,
+//             [week]: prev[week].filter(meal => meal.id !== mealId)
+//         }));
+//         toast.success("Meal deleted successfully");
+//     };
+
+//     // Common card rendering function with delete button
+//     const renderWeekMeals = (week) => {
+//         return weekMeals[week].map((recipe) => (
+//             <Col sm="4" key={recipe.id}>
+//                 <Card className="recipe-card">
+//                     <CardBody>
+//                         <Container className='mt-3'>
+//                             <div style={{ position: 'relative' }}>
+//                                 <CardImg
+//                                     top
+//                                     width="100%"
+//                                     src={recipe.image || 'https://via.placeholder.com/300'}
+//                                     alt={recipe.name}
+//                                 />
+//                                 <Button 
+//                                     color="danger" 
+//                                     style={{ 
+//                                         position: 'absolute', 
+//                                         top: '10px', 
+//                                         right: '10px',
+//                                         padding: '5px 10px',
+//                                         fontSize: '0.8rem'
+//                                     }}
+//                                     onClick={() => handleDelete(week, recipe.id)}
+//                                 >
+//                                     Delete
+//                                 </Button>
+//                             </div>
+//                             <CardTitle className='mt-3' tag="h5">{recipe.name}</CardTitle>
+//                             <CardText>
+//                                 <strong>Ingredients:</strong>
+//                                 <div>{recipe.ingredients}</div>
+//                             </CardText>
+//                             <CardText>
+//                                 <div className='d-flex justify-content-between'>
+//                                     <div className='d-flex gap-2 align-items-baseline'>
+//                                         <strong>Cuisine:</strong>
+//                                         <p>{recipe.cuisine}</p>
+//                                     </div>
+//                                     <div className='d-flex gap-2 align-items-baseline'>
+//                                         <strong>Rating:</strong>
+//                                         <p>{recipe.rating} ★</p>
+//                                     </div>
+//                                 </div>
+//                             </CardText>
+//                         </Container>
+//                     </CardBody>
+//                 </Card>
+//             </Col>
+//         ));
 //     };
 
 //     return (
@@ -124,7 +190,10 @@
 //                         <Row>
 //                             {recipes.map((recipe) => (
 //                                 <Col sm="4" key={recipe.id}>
-//                                     <Card className="recipe-card" onClick={() => handleCardClick(recipe)}>
+//                                     <Card 
+//                                         className={`recipe-card ${selectedMeal?.id === recipe.id ? 'selected' : ''}`} 
+//                                         onClick={() => handleCardClick(recipe)}
+//                                     >
 //                                         <CardBody>
 //                                             <Container className='mt-3'>
 //                                                 <CardImg
@@ -157,152 +226,26 @@
 //                             ))}
 //                         </Row>
 //                     </TabPane>
+
+//                     {/* Week Tabs */}
 //                     <TabPane tabId="2">
 //                         <Row>
-//                             {weekMeals['2'].map((recipe, index) => (
-//                                 <Col sm="4" key={index}>
-//                                     <Card className="recipe-card" onClick={() => handleCardClick(recipe)}>
-//                                         <CardBody>
-//                                             <Container className='mt-3'>
-//                                                 <CardImg
-//                                                     top
-//                                                     width="100%"
-//                                                     src={recipe.image || 'https://via.placeholder.com/300'}
-//                                                     alt={recipe.name}
-//                                                 />
-//                                                 <CardTitle className='mt-3' tag="h5">{recipe.name}</CardTitle>
-//                                                 <CardText>
-//                                                     <strong>Ingredients:</strong>
-//                                                     <div>{recipe.ingredients}</div>
-//                                                 </CardText>
-//                                                 <CardText>
-//                                                     <div className='d-flex justify-content-between'>
-//                                                         <div className='d-flex gap-2 align-items-baseline'>
-//                                                             <strong>Cuisine:</strong>
-//                                                             <p>{recipe.cuisine}</p>
-//                                                         </div>
-//                                                         <div className='d-flex gap-2 align-items-baseline'>
-//                                                             <strong>Rating:</strong>
-//                                                             <p>{recipe.rating} ★</p>
-//                                                         </div>
-//                                                     </div>
-//                                                 </CardText>
-//                                             </Container>
-//                                         </CardBody>
-//                                     </Card>
-//                                 </Col>
-//                             ))}
+//                             {renderWeekMeals('2')}
 //                         </Row>
 //                     </TabPane>
 //                     <TabPane tabId="3">
 //                         <Row>
-//                             {weekMeals['3'].map((recipe, index) => (
-//                                 <Col sm="4" key={index}>
-//                                     <Card className="recipe-card" onClick={() => handleCardClick(recipe)}>
-//                                         <CardBody>
-//                                             <Container className='mt-3'>
-//                                                 <CardImg
-//                                                     top
-//                                                     width="100%"
-//                                                     src={recipe.image || 'https://via.placeholder.com/300'}
-//                                                     alt={recipe.name}
-//                                                 />
-//                                                 <CardTitle className='mt-3' tag="h5">{recipe.name}</CardTitle>
-//                                                 <CardText>
-//                                                     <strong>Ingredients:</strong>
-//                                                     <div>{recipe.ingredients}</div>
-//                                                 </CardText>
-//                                                 <CardText>
-//                                                     <div className='d-flex justify-content-between'>
-//                                                         <div className='d-flex gap-2 align-items-baseline'>
-//                                                             <strong>Cuisine:</strong>
-//                                                             <p>{recipe.cuisine}</p>
-//                                                         </div>
-//                                                         <div className='d-flex gap-2 align-items-baseline'>
-//                                                             <strong>Rating:</strong>
-//                                                             <p>{recipe.rating} ★</p>
-//                                                         </div>
-//                                                     </div>
-//                                                 </CardText>
-//                                             </Container>
-//                                         </CardBody>
-//                                     </Card>
-//                                 </Col>
-//                             ))}
+//                             {renderWeekMeals('3')}
 //                         </Row>
 //                     </TabPane>
 //                     <TabPane tabId="4">
 //                         <Row>
-//                             {weekMeals['4'].map((recipe, index) => (
-//                                 <Col sm="4" key={index}>
-//                                     <Card className="recipe-card" onClick={() => handleCardClick(recipe)}>
-//                                         <CardBody>
-//                                             <Container className='mt-3'>
-//                                                 <CardImg
-//                                                     top
-//                                                     width="100%"
-//                                                     src={recipe.image || 'https://via.placeholder.com/300'}
-//                                                     alt={recipe.name}
-//                                                 />
-//                                                 <CardTitle className='mt-3' tag="h5">{recipe.name}</CardTitle>
-//                                                 <CardText>
-//                                                     <strong>Ingredients:</strong>
-//                                                     <div>{recipe.ingredients}</div>
-//                                                 </CardText>
-//                                                 <CardText>
-//                                                     <div className='d-flex justify-content-between'>
-//                                                         <div className='d-flex gap-2 align-items-baseline'>
-//                                                             <strong>Cuisine:</strong>
-//                                                             <p>{recipe.cuisine}</p>
-//                                                         </div>
-//                                                         <div className='d-flex gap-2 align-items-baseline'>
-//                                                             <strong>Rating:</strong>
-//                                                             <p>{recipe.rating} ★</p>
-//                                                         </div>
-//                                                     </div>
-//                                                 </CardText>
-//                                             </Container>
-//                                         </CardBody>
-//                                     </Card>
-//                                 </Col>
-//                             ))}
+//                             {renderWeekMeals('4')}
 //                         </Row>
 //                     </TabPane>
 //                     <TabPane tabId="5">
 //                         <Row>
-//                             {weekMeals['5'].map((recipe, index) => (
-//                                 <Col sm="4" key={index}>
-//                                     <Card className="recipe-card" onClick={() => handleCardClick(recipe)}>
-//                                         <CardBody>
-//                                             <Container className='mt-3'>
-//                                                 <CardImg
-//                                                     top
-//                                                     width="100%"
-//                                                     src={recipe.image || 'https://via.placeholder.com/300'}
-//                                                     alt={recipe.name}
-//                                                 />
-//                                                 <CardTitle className='mt-3' tag="h5">{recipe.name}</CardTitle>
-//                                                 <CardText>
-//                                                     <strong>Ingredients:</strong>
-//                                                     <div>{recipe.ingredients}</div>
-//                                                 </CardText>
-//                                                 <CardText>
-//                                                     <div className='d-flex justify-content-between'>
-//                                                         <div className='d-flex gap-2 align-items-baseline'>
-//                                                             <strong>Cuisine:</strong>
-//                                                             <p>{recipe.cuisine}</p>
-//                                                         </div>
-//                                                         <div className='d-flex gap-2 align-items-baseline'>
-//                                                             <strong>Rating:</strong>
-//                                                             <p>{recipe.rating} ★</p>
-//                                                         </div>
-//                                                     </div>
-//                                                 </CardText>
-//                                             </Container>
-//                                         </CardBody>
-//                                     </Card>
-//                                 </Col>
-//                             ))}
+//                             {renderWeekMeals('5')}
 //                         </Row>
 //                     </TabPane>
 //                 </TabContent>
@@ -312,7 +255,6 @@
 //             <Modal size='lg' isOpen={modalOpen} toggle={toggleModal}>
 //                 <ModalHeader toggle={toggleModal}>Add a Meal</ModalHeader>
 //                 <ModalBody>
-//                     {/* Tabs in the Modal */}
 //                     <Nav tabs>
 //                         <div className='d-flex gap-5'>
 //                             <NavItem>
@@ -362,341 +304,239 @@
 // export default Body;
 
 
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Header from './header';
-import '../App.css';
-import { Nav, NavItem, NavLink, TabContent, TabPane, Row, Col, Card, CardImg, CardBody, CardTitle, CardText, Button, Container, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { 
+  Nav, NavItem, NavLink, TabContent, TabPane, 
+  Row, Col, Card, CardImg, CardBody, 
+  CardTitle, CardText, Button, Container, 
+  Modal, ModalHeader, ModalBody, ModalFooter 
+} from 'reactstrap';
+import { toast } from 'react-toastify';
 
 const Body = () => {
-    const [activeTab, setActiveTab] = useState('1');
-    const [recipes, setRecipes] = useState([]);
-    const [modalOpen, setModalOpen] = useState(false);
-    const [selectedMeal, setSelectedMeal] = useState(null); // state to store selected meal
-    const [selectedWeek, setSelectedWeek] = useState(null); // state to store selected week
-    const [weekMeals, setWeekMeals] = useState({
-        '2': [], // Week 1
-        '3': [], // Week 2
-        '4': [], // Week 3
-        '5': [], // Week 4
-    });
+  const [activeTab, setActiveTab] = useState('1');
+  const [recipes, setRecipes] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState(null);
+  const [selectedWeek, setSelectedWeek] = useState(null);
+  const [weekMeals, setWeekMeals] = useState({
+    '2': [], '3': [], '4': [], '5': []
+  });
 
+  const getRecords = async () => {
+    try {
+      const response = await axios.get("https://dummyjson.com/recipes");
+      setRecipes(response.data.recipes);
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
+    }
+  };
 
-    console.log(weekMeals, 'ssss')
+  useEffect(() => { getRecords(); }, []);
 
-    const getRecords = async () => {
-        try {
-            const response = await axios.get("https://dummyjson.com/recipes");
-            setRecipes(response.data.recipes);
-        } catch (error) {
-            console.error("Error fetching recipes:", error);
-        }
-    };
+  const toggleTab = (tab) => activeTab !== tab && setActiveTab(tab);
+  const toggleModal = () => setModalOpen(!modalOpen);
 
-    useEffect(() => {
-        getRecords();
-    }, []);
+  const handleCardClick = (meal) => setSelectedMeal(meal);
 
-    const toggleTab = (tab) => {
-        if (activeTab !== tab) setActiveTab(tab);
-    };
+  const handleSaveMeal = () => {
+    if (!selectedMeal || !selectedWeek) return;
+    
+    const isDuplicate = weekMeals[selectedWeek].some(meal => meal.id === selectedMeal.id);
+    if (isDuplicate) {
+      toast.error('Meal already Exit! Try Different :)');
+      return;
+    }
 
-    const toggleModal = () => setModalOpen(!modalOpen);
+    setWeekMeals(prev => ({
+      ...prev,
+      [selectedWeek]: [...prev[selectedWeek], selectedMeal]
+    }));
+    setModalOpen(false);
+    toast.success("Meal Added Successfully");
+  };
 
-    const handleCardClick = (meal) => {
-        setSelectedMeal(meal); // Set selected meal when a card is clicked
-    };
+  const handleDelete = (week, mealId) => {
+    setWeekMeals(prev => ({
+      ...prev,
+      [week]: prev[week].filter(meal => meal.id !== mealId)
+    }));
+    toast.success("Meal deleted successfully");
+  };
 
-    const handleSaveMeal = () => {
-        if (selectedMeal && selectedWeek) {
-            const alreadyAdded = weekMeals[selectedWeek].some(meal => meal.id === selectedMeal.id); // Check if the meal already exists
-
-            if (alreadyAdded) {
-                alert('This meal is already added to the selected week!');
-                return;
-            }
-
-            setWeekMeals((prevMeals) => {
-                const updatedMeals = { ...prevMeals };
-                updatedMeals[selectedWeek].push(selectedMeal); // Add the selected meal to the selected week
-                return updatedMeals;
-            });
-            setModalOpen(false); // Close the modal after saving
-        } else {
-            alert('Please select a meal and a week!');
-        }
-    };
-
-    const handleWeekSelection = (week) => {
-        setSelectedWeek(week); // Set selected week when a tab is clicked in the modal
-    };
-
-    return (
-        <div>
-            <Header />
-            <div className="main-container">
-                <div className="text-center mb-5">
-                    <h2 className="display-5">Week Order</h2>
-                    <p className="text-muted">Plan your meals for the week</p>
-                </div>
-
-                {/* Tabs Section */}
-                <div className="centered-tabs">
-                    <Nav tabs>
-                        <NavItem>
-                            <NavLink
-                                active={activeTab === '1'}
-                                onClick={() => toggleTab('1')}
-                            >
-                                All Meals
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                active={activeTab === '2'}
-                                onClick={() => toggleTab('2')}
-                            >
-                                Week 1
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                active={activeTab === '3'}
-                                onClick={() => toggleTab('3')}
-                            >
-                                Week 2
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                active={activeTab === '4'}
-                                onClick={() => toggleTab('4')}
-                            >
-                                Week 3
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink
-                                active={activeTab === '5'}
-                                onClick={() => toggleTab('5')}
-                            >
-                                Week 4
-                            </NavLink>
-                        </NavItem>
-                    </Nav>
-                    <Button className='align-items-baseline' color='primary' onClick={toggleModal}>
-                        Add Meal
-                    </Button>
-                </div>
-
-                {/* Tab Content */}
-                <TabContent activeTab={activeTab}>
-                    <TabPane tabId="1">
-                        <Row>
-                            {recipes.map((recipe) => (
-                                <Col sm="4" key={recipe.id}>
-                                    <Card 
-                                        className={`recipe-card ${selectedMeal?.id === recipe.id ? 'selected' : ''}`} 
-                                        onClick={() => handleCardClick(recipe)}
-                                    >
-                                        <CardBody>
-                                            <Container className='mt-3'>
-                                                <CardImg
-                                                    top
-                                                    width="100%"
-                                                    src={recipe.image || 'https://via.placeholder.com/300'}
-                                                    alt={recipe.name}
-                                                />
-                                                <CardTitle className='mt-3' tag="h5">{recipe.name}</CardTitle>
-                                                <CardText>
-                                                    <strong>Ingredients:</strong>
-                                                    <div>{recipe.ingredients}</div>
-                                                </CardText>
-                                                <CardText>
-                                                    <div className='d-flex justify-content-between'>
-                                                        <div className='d-flex gap-2 align-items-baseline'>
-                                                            <strong>Cuisine:</strong>
-                                                            <p>{recipe.cuisine}</p>
-                                                        </div>
-                                                        <div className='d-flex gap-2 align-items-baseline'>
-                                                            <strong>Rating:</strong>
-                                                            <p>{recipe.rating} ★</p>
-                                                        </div>
-                                                    </div>
-                                                </CardText>
-                                            </Container>
-                                        </CardBody>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
-                    </TabPane>
-
-                    {/* Week Tabs - similar for all the weeks */}
-                    <TabPane tabId="2">
-                        <Row>
-                            {weekMeals['2'].map((recipe, index) => (
-                                <Col sm="4" key={index}>
-                                    <Card className="recipe-card" onClick={() => handleCardClick(recipe)}>
-                                        <CardBody>
-                                            <Container className='mt-3'>
-                                                <CardImg
-                                                    top
-                                                    width="100%"
-                                                    src={recipe.image || 'https://via.placeholder.com/300'}
-                                                    alt={recipe.name}
-                                                />
-                                                <CardTitle className='mt-3' tag="h5">{recipe.name}</CardTitle>
-                                                <CardText>
-                                                    <strong>Ingredients:</strong>
-                                                    <div>{recipe.ingredients}</div>
-                                                </CardText>
-                                                <CardText>
-                                                    <div className='d-flex justify-content-between'>
-                                                        <div className='d-flex gap-2 align-items-baseline'>
-                                                            <strong>Cuisine:</strong>
-                                                            <p>{recipe.cuisine}</p>
-                                                        </div>
-                                                        <div className='d-flex gap-2 align-items-baseline'>
-                                                            <strong>Rating:</strong>
-                                                            <p>{recipe.rating} ★</p>
-                                                        </div>
-                                                    </div>
-                                                </CardText>
-                                            </Container>
-                                        </CardBody>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
-                    </TabPane>
-                    <TabPane tabId="3">
-                        <Row>
-                            {weekMeals['3'].map((recipe, index) => (
-                                <Col sm="4" key={index}>
-                                    <Card className="recipe-card" onClick={() => handleCardClick(recipe)}>
-                                        <CardBody>
-                                            <Container className='mt-3'>
-                                                <CardImg
-                                                    top
-                                                    width="100%"
-                                                    src={recipe.image || 'https://via.placeholder.com/300'}
-                                                    alt={recipe.name}
-                                                />
-                                                <CardTitle className='mt-3' tag="h5">{recipe.name}</CardTitle>
-                                                <CardText>
-                                                    <strong>Ingredients:</strong>
-                                                    <div>{recipe.ingredients}</div>
-                                                </CardText>
-                                                <CardText>
-                                                    <div className='d-flex justify-content-between'>
-                                                        <div className='d-flex gap-2 align-items-baseline'>
-                                                            <strong>Cuisine:</strong>
-                                                            <p>{recipe.cuisine}</p>
-                                                        </div>
-                                                        <div className='d-flex gap-2 align-items-baseline'>
-                                                            <strong>Rating:</strong>
-                                                            <p>{recipe.rating} ★</p>
-                                                        </div>
-                                                    </div>
-                                                </CardText>
-                                            </Container>
-                                        </CardBody>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
-                    </TabPane>
-                    <TabPane tabId="4">
-                        <Row>
-                            {weekMeals['4'].map((recipe, index) => (
-                                <Col sm="4" key={index}>
-                                    <Card className="recipe-card" onClick={() => handleCardClick(recipe)}>
-                                        <CardBody>
-                                            <Container className='mt-3'>
-                                                <CardImg
-                                                    top
-                                                    width="100%"
-                                                    src={recipe.image || 'https://via.placeholder.com/300'}
-                                                    alt={recipe.name}
-                                                />
-                                                <CardTitle className='mt-3' tag="h5">{recipe.name}</CardTitle>
-                                                <CardText>
-                                                    <strong>Ingredients:</strong>
-                                                    <div>{recipe.ingredients}</div>
-                                                </CardText>
-                                                <CardText>
-                                                    <div className='d-flex justify-content-between'>
-                                                        <div className='d-flex gap-2 align-items-baseline'>
-                                                            <strong>Cuisine:</strong>
-                                                            <p>{recipe.cuisine}</p>
-                                                        </div>
-                                                        <div className='d-flex gap-2 align-items-baseline'>
-                                                            <strong>Rating:</strong>
-                                                            <p>{recipe.rating} ★</p>
-                                                        </div>
-                                                    </div>
-                                                </CardText>
-                                            </Container>
-                                        </CardBody>
-                                    </Card>
-                                </Col>
-                            ))}
-                        </Row>
-                    </TabPane>
-                </TabContent>
+  const renderWeekMeals = (week) => (
+    weekMeals[week].map(recipe => (
+      <Col xs={12} sm={6} md={3} lg={3} key={recipe.id}>
+        <Card className="h-100 shadow-sm">
+          <CardBody className="d-flex flex-column">
+            <div style={{ 
+              position: 'relative', 
+              height: '200px', 
+              overflow: 'hidden' 
+            }}>
+              <CardImg
+                top
+                src={recipe.image || 'https://via.placeholder.com/300'}
+                alt={recipe.name}
+                style={{
+                  objectFit: 'cover',
+                  width: '100%',
+                  height: '100%'
+                }}
+              />
+              <Button
+                color="danger"
+                className="position-absolute top-0 end-0 m-2"
+                style={{ 
+                  padding: '5px 10px',
+                  fontSize: '0.8rem',
+                  zIndex: 1
+                }}
+                onClick={() => handleDelete(week, recipe.id)}
+              >
+                Delete
+              </Button>
             </div>
+            <CardTitle className="mt-3 h5">{recipe.name}</CardTitle>
+            <CardText className="flex-grow-1">
+              <strong>Ingredients:</strong>
+              <div className="text-truncate">
+                {recipe.ingredients?.join(', ') || 'No ingredients listed'}
+              </div>
+            </CardText>
+            <div className="d-flex justify-content-between small">
+              <span>{recipe.cuisine}</span>
+              <span>{recipe.rating} ★</span>
+            </div>
+          </CardBody>
+        </Card>
+      </Col>
+    ))
+  );
 
-            {/* Modal for adding meal */}
-            <Modal size='lg' isOpen={modalOpen} toggle={toggleModal}>
-                <ModalHeader toggle={toggleModal}>Add a Meal</ModalHeader>
-                <ModalBody>
-                    {/* Tabs in the Modal */}
-                    <Nav tabs>
-                        <div className='d-flex gap-5'>
-                            <NavItem>
-                                <NavLink
-                                    active={selectedWeek === '2'}
-                                    onClick={() => handleWeekSelection('2')}
-                                >
-                                    Week 1
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink
-                                    active={selectedWeek === '3'}
-                                    onClick={() => handleWeekSelection('3')}
-                                >
-                                    Week 2
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink
-                                    active={selectedWeek === '4'}
-                                    onClick={() => handleWeekSelection('4')}
-                                >
-                                    Week 3
-                                </NavLink>
-                            </NavItem>
-                            <NavItem>
-                                <NavLink
-                                    active={selectedWeek === '5'}
-                                    onClick={() => handleWeekSelection('5')}
-                                >
-                                    Week 4
-                                </NavLink>
-                            </NavItem>
-                        </div>
-                    </Nav>
-                </ModalBody>
-                <ModalFooter>
-                    <Button color="secondary" onClick={toggleModal}>Cancel</Button>
-                    <Button color="primary" onClick={handleSaveMeal}>Save Meal</Button>
-                </ModalFooter>
-            </Modal>
+  return (
+    <div className="bg-light">
+      {/* <Header /> */}
+      <Container fluid="lg" className="py-4">
+        <div className="text-center mb-5">
+          <h1 className="display-6 mb-2">Weekly Meal Planner</h1>
+          <p className="text-muted">Organize your meals for the month</p>
         </div>
-    );
+
+        {/* Navigation Section */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+          <Nav tabs className="flex-wrap">
+            <NavItem>
+              <NavLink active={activeTab === '1'} onClick={() => toggleTab('1')}>
+                All Meals
+              </NavLink>
+            </NavItem>
+            {[2, 3, 4, 5].map(week => (
+              <NavItem key={week}>
+                <NavLink 
+                  active={activeTab === String(week)} 
+                  onClick={() => toggleTab(String(week))}
+                >
+                  Week {week-1}
+                </NavLink>
+              </NavItem>
+            ))}
+          </Nav>
+          <Button 
+            color="primary" 
+            className="align-self-md-center"
+            onClick={toggleModal}
+          >
+            Add Meal
+          </Button>
+        </div>
+
+        {/* Main Content */}
+        <TabContent activeTab={activeTab}>
+          {/* All Meals Tab */}
+          <TabPane tabId="1">
+            <Row className="g-4">
+              {recipes.map(recipe => (
+                <Col xs={12} sm={6} md={3} lg={3} key={recipe.id}>
+                  <Card 
+                    className={`h-100 shadow-sm ${selectedMeal?.id === recipe.id ? 'border-primary' : ''}`}
+                    onClick={() => handleCardClick(recipe)}
+                  >
+                    <CardBody className="d-flex flex-column">
+                      <div style={{ 
+                        height: '200px', 
+                        overflow: 'hidden' 
+                      }}>
+                        <CardImg
+                          src={recipe.image || 'https://via.placeholder.com/300'}
+                          alt={recipe.name}
+                          style={{
+                            objectFit: 'cover',
+                            width: '100%',
+                            height: '100%'
+                          }}
+                        />
+                      </div>
+                      <CardTitle className="mt-3 h5">{recipe.name}</CardTitle>
+                      <CardText className="flex-grow-1">
+                        <strong>Ingredients:</strong>
+                        <div className="text-truncate">
+                          {recipe.ingredients?.join(', ') || 'No ingredients listed'}
+                        </div>
+                      </CardText>
+                      <div className="d-flex justify-content-between small">
+                        <span>{recipe.cuisine}</span>
+                        <span>{recipe.rating} ★</span>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </TabPane>
+
+          {/* Week Tabs */}
+          {[2, 3, 4, 5].map(week => (
+            <TabPane key={week} tabId={String(week)}>
+              <Row className="g-4">
+                {renderWeekMeals(String(week))}
+              </Row>
+            </TabPane>
+          ))}
+        </TabContent>
+
+        {/* Add Meal Modal */}
+        <Modal isOpen={modalOpen} toggle={toggleModal} centered>
+          <ModalHeader toggle={toggleModal}>Select Week</ModalHeader>
+          <ModalBody>
+            <Nav className="gap-2">
+              {[2, 3, 4, 5].map(week => (
+                <NavItem key={week}>
+                  <Button
+                    color={selectedWeek === String(week) ? 'primary' : 'secondary'}
+                    className="w-100"
+                    onClick={() => setSelectedWeek(String(week))}
+                  >
+                    Week {week-1}
+                  </Button>
+                </NavItem>
+              ))}
+            </Nav>
+          </ModalBody>
+          <ModalFooter className="d-flex gap-2">
+            <Button color="secondary" onClick={toggleModal} block>
+              Cancel
+            </Button>
+            <Button color="primary" onClick={handleSaveMeal} block>
+              Confirm Selection
+            </Button>
+          </ModalFooter>
+        </Modal>
+      </Container>
+    </div>
+  );
 };
 
 export default Body;
